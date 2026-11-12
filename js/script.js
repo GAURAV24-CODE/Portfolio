@@ -1,259 +1,51 @@
+(function(){
+  // Set your Formspree form URL (https://formspree.io) to send messages for real, e.g. "https://formspree.io/f/abcdwxyz"
+  var FORM_ENDPOINT = "";
+  var EMAIL = "kumbhargaurav24@gmail.com";
+  var $ = function(s,r){return (r||document).querySelector(s)}, $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  var body = document.body, store = {get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
-/* =========================================
-   GAURAV KUMBHAR - PORTFOLIO JAVASCRIPT
-   Multi-page Portfolio
-========================================= */
+  // sidebar collapse + mobile drawer
+  if (store.get('collapsed')==='1') body.classList.add('collapsed');
+  $('#collapse').addEventListener('click',function(){var c=body.classList.toggle('collapsed');store.set('collapsed',c?'1':'0')});
+  var mb=$('#menuBtn'); function drawer(o){body.classList.toggle('open',o);mb.setAttribute('aria-expanded',o)}
+  mb.addEventListener('click',function(){drawer(!body.classList.contains('open'))});
+  $('#scrim').addEventListener('click',function(){drawer(false)});
+  $$('.nav-link').forEach(function(a){a.addEventListener('click',function(){drawer(false)})});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')drawer(false)});
 
-document.addEventListener("DOMContentLoaded", function () {
+  // theme
+  $('#theme').addEventListener('click',function(){var d=document.documentElement,t=d.dataset.theme==='dark'?'light':'dark';d.dataset.theme=t;store.set('theme',t)});
 
-    // =====================================
-    // 1. ELEMENT REFERENCES
-    // =====================================
+  // active section indicator
+  var links=$$('.nav-link'), secs=$$('main .sec');
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(l){var on=l.getAttribute('href')==='#'+e.target.id;l.classList.toggle('active',on);if(on)l.setAttribute('aria-current','true');else l.removeAttribute('aria-current')})}})},{rootMargin:'-40% 0px -55% 0px'});
+  secs.forEach(function(s){io.observe(s)});
 
-    const sidebar = document.getElementById("sidebar");
-    const menuToggle = document.getElementById("menuToggle");
+  // reveal on scroll
+  var rv=$$('.reveal');
+  if('IntersectionObserver' in window){var ro=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');ro.unobserve(e.target)}})},{threshold:.12});rv.forEach(function(r){ro.observe(r)})}else rv.forEach(function(r){r.classList.add('in')});
 
-    const navigationLinks = document.querySelectorAll(".nav-link");
-    const yearElements = document.querySelectorAll(".current-year");
+  // viewer profile (reorders sections)
+  $$('.viewer .pill').forEach(function(b){b.addEventListener('click',function(){$$('.viewer .pill').forEach(function(x){x.classList.remove('on');x.setAttribute('aria-pressed','false')});b.classList.add('on');b.setAttribute('aria-pressed','true');$('#main').dataset.profile=b.dataset.p})});
 
-    // =====================================
-    // 2. MOBILE SIDEBAR
-    // =====================================
+  // copy email
+  $('#copyMail').addEventListener('click',function(){var b=this;(navigator.clipboard?navigator.clipboard.writeText(EMAIL):Promise.reject()).then(function(){b.setAttribute('aria-label','Copied');b.style.color='#3ddc97';setTimeout(function(){b.style.color='';b.setAttribute('aria-label','Copy email address')},1500)}).catch(function(){window.prompt('Copy email:',EMAIL)})});
 
-    function closeSidebar() {
-
-        if (!sidebar || !menuToggle) return;
-
-        sidebar.classList.remove("open");
-
-        menuToggle.setAttribute("aria-expanded", "false");
-        menuToggle.innerHTML = "☰";
-
+  // contact form: real submission via Formspree; honest mailto fallback when no endpoint is configured
+  var f=$('#contactForm'), msg=$('#formMsg'), btn=$('#sendBtn');
+  function say(t,c){msg.textContent=t;msg.className='form-msg '+(c||'')}
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var d=new FormData(f); if(d.get('_gotcha'))return;
+    if(!f.checkValidity()){f.reportValidity();return}
+    if(!FORM_ENDPOINT){
+      var u='mailto:'+EMAIL+'?subject='+encodeURIComponent(d.get('subject'))+'&body='+encodeURIComponent(d.get('message')+'\n\n— '+d.get('name')+' ('+d.get('email')+')');
+      say('Opening your email app. Nothing is sent until you press Send there.');window.location.href=u;return;
     }
-
-    function toggleSidebar() {
-
-        if (!sidebar || !menuToggle) return;
-
-        const isOpen = sidebar.classList.toggle("open");
-
-        menuToggle.setAttribute(
-            "aria-expanded",
-            String(isOpen)
-        );
-
-        menuToggle.innerHTML = isOpen ? "✕" : "☰";
-
-    }
-
-    if (sidebar && menuToggle) {
-
-        menuToggle.addEventListener("click", function (event) {
-
-            event.stopPropagation();
-            toggleSidebar();
-
-        });
-
-        // Close sidebar when clicking outside
-
-        document.addEventListener("click", function (event) {
-
-            const clickedInsideSidebar =
-                sidebar.contains(event.target);
-
-            const clickedMenuButton =
-                menuToggle.contains(event.target);
-
-            if (
-                sidebar.classList.contains("open") &&
-                !clickedInsideSidebar &&
-                !clickedMenuButton
-            ) {
-
-                closeSidebar();
-
-            }
-
-        });
-
-        // Close sidebar after selecting a navigation link
-
-        navigationLinks.forEach(function (link) {
-
-            link.addEventListener("click", function () {
-
-                closeSidebar();
-
-            });
-
-        });
-
-        // Close sidebar with Escape key
-
-        document.addEventListener("keydown", function (event) {
-
-            if (
-                event.key === "Escape" &&
-                sidebar.classList.contains("open")
-            ) {
-
-                closeSidebar();
-                menuToggle.focus();
-
-            }
-
-        });
-
-    }
-
-    // =====================================
-    // 3. ACTIVE PAGE NAVIGATION
-    // =====================================
-
-    let currentPage = window.location.pathname
-        .split("/")
-        .filter(Boolean)
-        .pop();
-
-    if (!currentPage || !currentPage.includes(".")) {
-
-        currentPage = "index.html";
-
-    }
-
-    navigationLinks.forEach(function (link) {
-
-        const linkPage = link
-            .getAttribute("href")
-            ?.split("/")
-            .filter(Boolean)
-            .pop();
-
-        const isActive = linkPage === currentPage;
-
-        link.classList.toggle("active", isActive);
-
-        if (isActive) {
-
-            link.setAttribute("aria-current", "page");
-
-        } else {
-
-            link.removeAttribute("aria-current");
-
-        }
-
-    });
-
-    // =====================================
-    // 4. AUTOMATIC FOOTER YEAR
-    // =====================================
-
-    yearElements.forEach(function (element) {
-
-        element.textContent = new Date().getFullYear();
-
-    });
-
-    // =====================================
-    // 5. RESPONSIVE SIDEBAR
-    // =====================================
-
-    window.addEventListener("resize", function () {
-
-        if (window.innerWidth > 850) {
-
-            closeSidebar();
-
-        }
-
-    });
-
-    // =====================================
-    // 6. CONTACT FORM MAILTO SUPPORT
-    // =====================================
-
-    const contactForm = document.getElementById("contactForm");
-
-    if (contactForm && !contactForm.dataset.mailtoHandled) {
-
-        contactForm.dataset.mailtoHandled = "true";
-
-        contactForm.addEventListener("submit", function (event) {
-
-            // Do not interfere with an existing form handler.
-            if (contactForm.dataset.customHandler === "true") {
-                return;
-            }
-
-            event.preventDefault();
-
-            const name = contactForm.querySelector(
-                '[name="name"]'
-            )?.value.trim();
-
-            const email = contactForm.querySelector(
-                '[name="email"]'
-            )?.value.trim();
-
-            const subject = contactForm.querySelector(
-                '[name="subject"]'
-            )?.value.trim();
-
-            const message = contactForm.querySelector(
-                '[name="message"]'
-            )?.value.trim();
-
-            if (!name || !email || !message) {
-
-                alert("Please complete your name, email and message.");
-
-                return;
-
-            }
-
-            const recipient = "kumbhargaurav24@gmail.com";
-
-            const mailSubject = encodeURIComponent(
-                subject || "Portfolio Contact Message"
-            );
-
-            const mailBody = encodeURIComponent(
-                "Name: " + name +
-                "\nEmail: " + email +
-                "\n\nMessage:\n" + message
-            );
-
-            const mailtoURL =
-                "mailto:" + recipient +
-                "?subject=" + mailSubject +
-                "&body=" + mailBody;
-
-            window.location.href = mailtoURL;
-
-        });
-
-    }
-
-    // =====================================
-    // 7. EXTERNAL LINKS
-    // =====================================
-
-    document.querySelectorAll('a[target="_blank"]').forEach(
-        function (link) {
-
-            link.setAttribute("rel", "noopener noreferrer");
-
-        }
-    );
-
-    // =====================================
-    // 8. CONSOLE MESSAGE
-    // =====================================
-
-    console.log(
-        "Gaurav Kumbhar Portfolio Loaded Successfully!"
-    );
-
-});
+    btn.disabled=true;say('Sending…');
+    fetch(FORM_ENDPOINT,{method:'POST',body:d,headers:{Accept:'application/json'}}).then(function(r){
+      if(r.ok){say('Message sent. Thank you, I will reply soon.','ok');f.reset()}else{throw new Error('bad')}
+    }).catch(function(){say('Could not send right now. Please email '+EMAIL+' directly.','err')}).finally(function(){btn.disabled=false});
+  });
+})();

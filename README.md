@@ -1,16 +1,24 @@
-# Gaurav Kumbhar - Portfolio
+# Gaurav Kumbhar — Portfolio
 
-Single-page portfolio (HTML/CSS/JS, no build step). Black + burgundy theme with small gold accents with light mode toggle.
+Single-page portfolio (plain HTML/CSS/JS, no build step). Dark burgundy theme with light-mode toggle, collapsible sidebar,
+viewer-profile switcher, project cards with real screenshots, certificates, architecture workflows and a contact form.
 
-## Run
-Open `index.html` in a browser. Logos load from the internet (simpleicons.org).
+## Run locally
+Open `index.html` in a browser (or `python3 -m http.server` in this folder). Fonts and tech logos load from the internet; the page still works offline with fallbacks.
 
-## Deploy (free)
-- Netlify: drag this folder onto app.netlify.com/drop
-- GitHub Pages: push the folder contents to a repo, then Settings > Pages
-- Vercel: `vercel` inside this folder
+## Make the contact form really send (required for production)
+1. Create a free form at https://formspree.io and copy its URL (looks like `https://formspree.io/f/abcdwxyz`).
+2. Paste it into `FORM_ENDPOINT` at the top of `js/script.js`.
+Until then the form opens the visitor's email app and says so — it never shows a fake "sent" message.
 
-## Edit
-All content is in `index.html`: hero, About, Experience, Projects, Technical Stack, Achievements, Certifications, Contact.
-- Replace the resume PDFs to update downloads (keep the file names, or edit the links).
-- Contact form opens the visitor's mail app; for a real form use Formspree.
+## Deploy
+- **Vercel:** `npm i -g vercel`, then run `vercel` in this folder (framework: Other, no build command, output: `.`).
+- **Render:** New > Static Site, connect the repo, build command empty, publish directory `.`.
+- **Netlify / GitHub Pages:** drag the folder onto app.netlify.com/drop, or push and enable Pages.
+
+## Edit content
+Project cards, skills, certificates and experience are in `index.html`. Resume PDFs live in `resume/`, certificates in `certificates/`, project screenshots in `project-images/`.
+
+## Notes
+- The Yuva AI for All certificate PDF is intentionally NOT included: it prints your date of birth and APAAR ID. Add a redacted copy to `certificates/` and link it if you want it public.
+- Items still needing your input are listed in the chat reply that came with this ZIP.
