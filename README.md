@@ -1,7 +1,7 @@
 # Gaurav Kumbhar — Portfolio
 
 Single-page portfolio (plain HTML/CSS/JS, no build step). Dark burgundy theme with light-mode toggle, collapsible sidebar,
-viewer-profile switcher, project cards with real screenshots, certificates, architecture workflows and a contact form.
+viewer-profile switcher, project cards with real screenots, certificates, architecture workflows and a contact form.
 
 ## Run locally
 Open `index.html` in a browser (or `python3 -m http.server` in this folder). Fonts and tech logos load from the internet; the page still works offline with fallbacks.
