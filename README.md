@@ -6,7 +6,7 @@ A modern, responsive, multi-page personal portfolio website built using **HTML5,
 
 The website features a premium dark burgundy visual identity, elegant typography, interactive navigation, project showcases, professional experience, technical skills, architecture workflows, certifications, and a contact form.
 
-Designed to provide visitors, recruiters, and developers with an engaging way to explore the portfolio.
+Designed to provide visitors, recruiters, and developers with an engaging .
 
 ---
 
